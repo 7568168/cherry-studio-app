@@ -2,7 +2,7 @@ import { TrueSheet } from '@lodev09/react-native-true-sheet'
 import { Button } from 'heroui-native'
 import React, { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { BackHandler, Keyboard, TouchableWithoutFeedback, View } from 'react-native'
+import { BackHandler, Keyboard, TouchableWithoutFeedback, View, ActivityIndicator } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import Text from '@/componentsV2/base/Text'
@@ -10,10 +10,12 @@ import TextField from '@/componentsV2/base/TextField'
 import XStack from '@/componentsV2/layout/XStack'
 import YStack from '@/componentsV2/layout/YStack'
 import { useTheme } from '@/hooks/useTheme'
+import { fetchModels } from '@/services/ApiService'
 import { loggerService } from '@/services/LoggerService'
 import type { Model, Provider } from '@/types/assistant'
 import { isIOS26 } from '@/utils/device'
 import { getDefaultGroupName } from '@/utils/naming'
+import { Download } from '@/componentsV2/icons/LucideIcon'
 
 const logger = loggerService.withContext('AddModelSheet')
 
@@ -45,6 +47,8 @@ export const AddModelSheet: React.FC = () => {
   const [modelName, setModelName] = useState('')
   const [modelGroup, setModelGroup] = useState('')
   const [isVisible, setIsVisible] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)
+  const [availableModels, setAvailableModels] = useState<Model[]>([])
   const insets = useSafeAreaInsets()
 
   useEffect(() => {
@@ -75,6 +79,35 @@ export const AddModelSheet: React.FC = () => {
     setModelId('')
     setModelName('')
     setModelGroup('')
+  }
+
+  const handleFetchModels = async () => {
+    if (!provider || isFetching) return
+    setIsFetching(true)
+    try {
+      const modelsFromApi = await fetchModels(provider)
+      const transformedModels = modelsFromApi.map(model => ({
+        id: model?.id || model?.name,
+        name: model?.display_name || model?.displayName || model?.name || model?.id,
+        provider: provider.id,
+        group: getDefaultGroupName(model?.id || model?.name, provider.id),
+        description: model?.description || '',
+        owned_by: model?.owned_by || '',
+        supported_endpoint_types: model?.supported_endpoint_types
+      })).filter(model => model.id && model.name)
+      setAvailableModels(transformedModels)
+    } catch (error) {
+      logger.error('Failed to fetch models:', error)
+      setAvailableModels([])
+    } finally {
+      setIsFetching(false)
+    }
+  }
+
+  const handleSelectModel = (model: Model) => {
+    setModelId(model.id)
+    setModelName(model.name)
+    setModelGroup(model.group)
   }
 
   const handleAddModel = async () => {
@@ -130,6 +163,48 @@ export const AddModelSheet: React.FC = () => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={{ paddingBottom: insets.bottom }}>
           <YStack className="items-center gap-6 px-5 pb-7">
+            {/* Fetch Models Button */}
+            <Button
+              pressableFeedbackVariant="ripple"
+              variant="secondary"
+              className="h-11 w-full rounded-2xl"
+              onPress={handleFetchModels}
+              isDisabled={!provider || isFetching}>
+              <Button.Label>
+                <XStack className="items-center gap-2">
+                  {isFetching ? (
+                    <ActivityIndicator size="small" color="#ffffff" />
+                  ) : (
+                    <Download size={16} color="#ffffff" />
+                  )}
+                  <Text className="text-white">{t('models.fetch_list') || 'Fetch Model List'}</Text>
+                </XStack>
+              </Button.Label>
+            </Button>
+
+            {/* Available Models List */}
+            {availableModels.length > 0 && (
+              <YStack className="w-full gap-2 max-h-48 overflow-y-auto">
+                <Text className="text-foreground-secondary text-sm px-3">Available Models:</Text>
+                <View className="w-full border rounded-2xl overflow-hidden">
+                  {availableModels.map((model) => (
+                    <View
+                      key={model.id}
+                      className="px-4 py-2 border-b last:border-b-0"
+                      style={{ backgroundColor: modelId === model.id ? '#e0e7ff' : 'transparent' }}
+                    >
+                      <TouchableWithoutFeedback onPress={() => handleSelectModel(model)}>
+                        <YStack className="gap-1">
+                          <Text className="text-sm font-medium">{model.name}</Text>
+                          <Text className="text-xs text-foreground-secondary">{model.id}</Text>
+                        </YStack>
+                      </TouchableWithoutFeedback>
+                    </View>
+                  ))}
+                </View>
+              </YStack>
+            )}
+
             {/* Model ID Input */}
             <YStack className="w-full gap-2">
               <XStack className="gap-2 px-3">
