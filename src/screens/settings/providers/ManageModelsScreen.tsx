@@ -4,7 +4,7 @@ import { cn, Tabs } from 'heroui-native'
 import { groupBy, isEmpty, uniqBy } from 'lodash'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native'
 
 import {
   Container,
@@ -21,7 +21,7 @@ import {
 } from '@/componentsV2'
 import { ModelTags } from '@/componentsV2/features/ModelTags'
 import { ModelIcon } from '@/componentsV2/icons'
-import { Minus, Plus } from '@/componentsV2/icons/LucideIcon'
+import { Minus, Plus, RefreshCw, Download } from '@/componentsV2/icons/LucideIcon'
 import {
   groupQwenModels,
   isEmbeddingModel,
@@ -114,7 +114,53 @@ const transformApiModels = (apiModels: any[], provider: Provider): Model[] => {
     .filter(model => !isEmpty(model.name))
 }
 
-// --- Tab Configuration (Static) ---
+interface ActionButtonProps {
+  icon: React.ReactNode
+  label: string
+  onPress: () => void
+  disabled?: boolean
+  loading?: boolean
+}
+
+const ActionButton = ({ icon, label, onPress, disabled = false, loading = false }: ActionButtonProps) => {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled || loading}
+      style={({ pressed }) => ({
+        flex: 1,
+        minWidth: 140,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        borderRadius: 8,
+        backgroundColor: disabled || loading ? '#e5e7eb' : pressed ? '#d1d5db' : '#f3f4f6',
+        opacity: disabled ? 0.5 : 1
+      })}
+    >
+      {loading ? (
+        <ActivityIndicator size="small" color="#6b7280" />
+      ) : (
+        <View style={{ width: 16, height: 16, alignItems: 'center', justifyContent: 'center' }}>
+          {icon}
+        </View>
+      )}
+      <Text
+        style={{
+          fontSize: 12,
+          fontWeight: '500',
+          color: disabled || loading ? '#9ca3af' : '#374151'
+        }}
+        numberOfLines={1}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  )
+}
 
 const TAB_CONFIGS = [
   { value: 'all', i18nKey: 'models.type.all' },
@@ -134,11 +180,12 @@ export default function ManageModelsScreen() {
   const [allModels, setAllModels] = useState<Model[]>([])
   const [activeFilterType, setActiveFilterType] = useState<string>('all')
   const [isLoading, setIsLoading] = useState(true)
+  const [isFetching, setIsFetching] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const showSkeleton = useSkeletonLoading(isLoading)
 
   const { providerId, providerName } = route.params
   const [provider, setProvider] = useState<Provider | undefined>(undefined)
-  // const { provider, updateProvider } = useProvider(providerId)
 
   const isModelInCurrentProvider = getIsModelInProvider(provider?.models || [])
   const isAllModelsInCurrentProvider = getIsAllInProvider(isModelInCurrentProvider)
@@ -155,6 +202,9 @@ export default function ManageModelsScreen() {
 
   const filteredModels = filterModels(searchFilteredModels, '', activeFilterType)
   const sortedModelGroups = groupAndSortModels(filteredModels, provider?.id || '')
+
+  const modelsToAddCount = filteredModels.filter(m => !isModelInCurrentProvider(m.id)).length
+  const modelsToRemoveCount = filteredModels.filter(m => isModelInCurrentProvider(m.id)).length
 
   const prepareModelForAdd = (model: Model): Model | null => {
     if (isEmpty(model.name)) {
@@ -210,6 +260,58 @@ export default function ManageModelsScreen() {
     await handleUpdateModels((provider?.models || []).filter(m => !modelsToRemoveIds.has(m.id)))
   }
 
+  const fetchModelsFromApi = async () => {
+    if (!provider) return
+
+    try {
+      const modelsFromApi = await fetchModels(provider)
+      const transformedModels = transformApiModels(modelsFromApi, provider)
+      console.log('transformedModels', transformedModels)
+      setAllModels(uniqBy(transformedModels, 'id'))
+    } catch (error) {
+      logger.error('Failed to fetch models', error)
+      setAllModels([])
+    }
+  }
+
+  const handleFetchModels = async () => {
+    if (isFetching || !provider) return
+    setIsFetching(true)
+    try {
+      const fetchedProvider = await providerService.getProvider(providerId)
+      if (fetchedProvider) {
+        setProvider(fetchedProvider)
+        const modelsFromApi = await fetchModels(fetchedProvider)
+        const transformedModels = transformApiModels(modelsFromApi, fetchedProvider)
+        setAllModels(uniqBy(transformedModels, 'id'))
+      }
+    } catch (error) {
+      logger.error('Failed to fetch models', error)
+    } finally {
+      setIsFetching(false)
+    }
+  }
+
+  const handleRefreshModels = async () => {
+    if (isRefreshing || !provider) return
+    setIsRefreshing(true)
+    try {
+      await fetchModelsFromApi()
+    } finally {
+      setIsRefreshing(false)
+    }
+  }
+
+  const handleBatchAddModels = async () => {
+    const modelsToAdd = filteredModels.filter(m => !isModelInCurrentProvider(m.id))
+    await onAddAllModels(modelsToAdd)
+  }
+
+  const handleBatchRemoveModels = async () => {
+    const modelsToRemove = filteredModels.filter(m => isModelInCurrentProvider(m.id))
+    await onRemoveAllModels(modelsToRemove)
+  }
+
   useEffect(() => {
     const fetchAndSetModels = async () => {
       const fetchedProvider = await providerService.getProvider(providerId)
@@ -239,7 +341,35 @@ export default function ManageModelsScreen() {
     <SafeAreaContainer className="flex-1">
       <HeaderBar title={t(`provider.${providerId}`, { defaultValue: providerName })} />
       <Container className="pb-0" onStartShouldSetResponder={() => false} onMoveShouldSetResponder={() => false}>
-        {/* Filter Tabs */}
+        <XStack className="px-3 py-2 gap-2" style={{ flexWrap: 'wrap' }}>
+          <ActionButton
+            icon={<Download size={14} color="#374151" />}
+            label={t('models.fetch_list') || 'Fetch'}
+            onPress={handleFetchModels}
+            loading={isFetching}
+            disabled={isFetching || isRefreshing}
+          />
+          <ActionButton
+            icon={<RefreshCw size={14} color="#374151" />}
+            label={t('models.refresh_list') || 'Refresh'}
+            onPress={handleRefreshModels}
+            loading={isRefreshing}
+            disabled={isFetching || isRefreshing}
+          />
+          <ActionButton
+            icon={<Plus size={14} color="#374151" />}
+            label={`Add (${modelsToAddCount})`}
+            onPress={handleBatchAddModels}
+            disabled={isFetching || isRefreshing || modelsToAddCount === 0}
+          />
+          <ActionButton
+            icon={<Minus size={14} color="#374151" />}
+            label={`Remove (${modelsToRemoveCount})`}
+            onPress={handleBatchRemoveModels}
+            disabled={isFetching || isRefreshing || modelsToRemoveCount === 0}
+          />
+        </XStack>
+
         <Tabs value={activeFilterType} onValueChange={setActiveFilterType}>
           <Tabs.ScrollView>
             <Tabs.List aria-label="Model filter tabs" className="bg-transparent">
