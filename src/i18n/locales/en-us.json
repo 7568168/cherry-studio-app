@@ -1087,5 +1087,21 @@
     "batch_remove_success_message": "Removed {{count}} models",
     "batch_remove_error": "Error",
     "batch_remove_error_message": "Failed to batch remove models"
+  },
+  "settings": {
+    "models": {
+      "manage": {
+        "fetch_list": "Fetch Models",
+        "refetch_list": "Refetch Models",
+        "add_listed": {
+          "label": "Add Listed Models",
+          "confirm": "Add all models to the list?"
+        },
+        "add_whole_group": "Add Whole Group",
+        "remove_listed": "Remove Listed Models",
+        "remove_model": "Remove Model",
+        "remove_whole_group": "Remove Whole Group"
+      }
+    }
   }
 }
