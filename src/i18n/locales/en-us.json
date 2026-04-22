@@ -1101,7 +1101,11 @@
         "remove_listed": "Remove Listed Models",
         "remove_model": "Remove Model",
         "remove_whole_group": "Remove Whole Group"
-      }
+      },
+      "sort_by_latency": "Sort by Latency",
+      "sort_by_name": "Sort by Name",
+      "health_check": "Health Check",
+      "fetch_and_sort": "Check & Sort"
     }
   }
 }
