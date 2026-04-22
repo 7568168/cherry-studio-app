@@ -1057,5 +1057,35 @@
       "start": "Start voice input",
       "stop": "Stop voice input"
     }
+  },
+  "models": {
+    "fetch_list": "Fetch Models",
+    "refresh_list": "Refresh",
+    "batch_add": "Batch Add",
+    "batch_remove": "Batch Remove",
+    "fetch_success": "Success",
+    "fetch_success_message": "Model list fetched successfully",
+    "fetch_error": "Error",
+    "fetch_error_message": "Failed to fetch model list",
+    "refresh_success": "Success",
+    "refresh_success_message": "Model list refreshed successfully",
+    "refresh_error": "Error",
+    "refresh_error_message": "Failed to refresh model list",
+    "no_models_to_add": "Info",
+    "no_models_to_add_message": "All models are already added",
+    "no_models_to_remove": "Info",
+    "no_models_to_remove_message": "No models to remove",
+    "batch_add_confirm": "Confirm",
+    "batch_add_confirm_message": "Add {{count}} models?",
+    "batch_add_success": "Success",
+    "batch_add_success_message": "Added {{count}} models",
+    "batch_add_error": "Error",
+    "batch_add_error_message": "Failed to batch add models",
+    "batch_remove_confirm": "Confirm",
+    "batch_remove_confirm_message": "Remove {{count}} models?",
+    "batch_remove_success": "Success",
+    "batch_remove_success_message": "Removed {{count}} models",
+    "batch_remove_error": "Error",
+    "batch_remove_error_message": "Failed to batch remove models"
   }
 }
