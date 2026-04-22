@@ -1057,5 +1057,35 @@
       "start": "开始语音输入",
       "stop": "停止语音输入"
     }
+  },
+  "models": {
+    "fetch_list": "获取模型列表",
+    "refresh_list": "重新获取",
+    "batch_add": "批量添加",
+    "batch_remove": "批量移除",
+    "fetch_success": "成功",
+    "fetch_success_message": "模型列表获取成功",
+    "fetch_error": "错误",
+    "fetch_error_message": "获取模型列表失败",
+    "refresh_success": "成功",
+    "refresh_success_message": "模型列表刷新成功",
+    "refresh_error": "错误",
+    "refresh_error_message": "刷新模型列表失败",
+    "no_models_to_add": "提示",
+    "no_models_to_add_message": "所有模型已添加",
+    "no_models_to_remove": "提示",
+    "no_models_to_remove_message": "没有可移除的模型",
+    "batch_add_confirm": "确认",
+    "batch_add_confirm_message": "确定添加 {{count}} 个模型？",
+    "batch_add_success": "成功",
+    "batch_add_success_message": "已添加 {{count}} 个模型",
+    "batch_add_error": "错误",
+    "batch_add_error_message": "批量添加失败",
+    "batch_remove_confirm": "确认",
+    "batch_remove_confirm_message": "确定移除 {{count}} 个模型？",
+    "batch_remove_success": "成功",
+    "batch_remove_success_message": "已移除 {{count}} 个模型",
+    "batch_remove_error": "错误",
+    "batch_remove_error_message": "批量移除失败"
   }
 }
