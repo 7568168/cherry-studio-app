@@ -1051,7 +1051,8 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
       url: 'https://api.lkeap.cloud.tencent.com'
     },
     websites: {
-      official: 'https://cloud.tencent.com/document'
+      official: 'https://cloud.tencent.com/document',
+      docs: 'https://cloud.tencent.com/document'
     }
   },
   alayanew: {
@@ -1064,7 +1065,8 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
       url: 'https://www.dmxapi.cn/v1'
     },
     websites: {
-      official: 'https://www.dmxapi.cn'
+      official: 'https://www.dmxapi.cn',
+      docs: 'https://www.dmxapi.cn'
     }
   },
   aionly: {
@@ -1072,7 +1074,8 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
       url: 'https://api.aiionly.com/v1'
     },
     websites: {
-      official: 'https://aiionly.com'
+      official: 'https://aiionly.com',
+      docs: 'https://aiionly.com'
     }
   },
   tokenflux: {
@@ -1081,6 +1084,7 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
     },
     websites: {
       official: 'https://tokenflux.ai',
+      docs: 'https://tokenflux.ai',
       models: `${TOKENFLUX_HOST}/models`
     }
   },
@@ -1205,7 +1209,8 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
       url: 'https://cephalon.cloud/user-center/v1/model'
     },
     websites: {
-      official: 'https://cephalon.cloud'
+      official: 'https://cephalon.cloud',
+      docs: 'https://cephalon.cloud'
     }
   },
   yi: {
@@ -1240,7 +1245,6 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
 
 export const PROVIDER_LIST_ORDER: SystemProviderId[] = [
   'cherryin',
-  'cherryai',
   'silicon',
   'aihubmix',
   'deepseek',
