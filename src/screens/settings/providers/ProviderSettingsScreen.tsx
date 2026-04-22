@@ -4,7 +4,7 @@ import { Spinner, Switch } from 'heroui-native'
 import { groupBy } from 'lodash'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ScrollView } from 'react-native'
+import { Pressable, ScrollView } from 'react-native'
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
 
 import {
