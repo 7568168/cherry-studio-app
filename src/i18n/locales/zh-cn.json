@@ -1101,7 +1101,11 @@
         "remove_listed": "移除列表中的模型",
         "remove_model": "移除模型",
         "remove_whole_group": "移除整个分组"
-      }
+      },
+      "sort_by_latency": "按延迟排序",
+      "sort_by_name": "按名称排序",
+      "health_check": "健康检测",
+      "fetch_and_sort": "检测并排序"
     }
   }
 }
