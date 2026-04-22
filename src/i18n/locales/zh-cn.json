@@ -1087,5 +1087,21 @@
     "batch_remove_success_message": "已移除 {{count}} 个模型",
     "batch_remove_error": "错误",
     "batch_remove_error_message": "批量移除失败"
+  },
+  "settings": {
+    "models": {
+      "manage": {
+        "fetch_list": "获取模型列表",
+        "refetch_list": "重新获取模型列表",
+        "add_listed": {
+          "label": "添加列表中的模型",
+          "confirm": "确定要添加所有模型到列表吗？"
+        },
+        "add_whole_group": "添加整个分组",
+        "remove_listed": "移除列表中的模型",
+        "remove_model": "移除模型",
+        "remove_whole_group": "移除整个分组"
+      }
+    }
   }
 }
