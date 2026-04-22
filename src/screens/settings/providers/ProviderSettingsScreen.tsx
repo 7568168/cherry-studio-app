@@ -36,6 +36,8 @@ import {
   Plus,
   RefreshCw,
   Trash2,
+  ChevronsUpDown,
+  ChevronsUpDown,
   XCircle
 } from '@/componentsV2/icons/LucideIcon'
 import { useProvider } from '@/hooks/useProviders'
