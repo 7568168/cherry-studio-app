@@ -1232,6 +1232,15 @@ export const PROVIDER_URLS: Record<SystemProviderId, ProviderUrls> = {
       docs: 'https://www.baichuan-ai.com/docs'
     }
   },
+  qiniu: {
+    api: {
+      url: 'https://api.qnaigc.com'
+    },
+    websites: {
+      official: 'https://qiniu.com',
+      docs: 'https://qiniu.com'
+    }
+  },
   nvidia: {
     api: {
       url: 'https://integrate.api.nvidia.com/v1'
