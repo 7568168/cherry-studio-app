@@ -85,11 +85,11 @@ export default function ProviderSettingsScreen() {
   const filteredModelGroups = Object.fromEntries(Object.entries(modelGroups).filter(([, models]) => models.length > 0))
 
   // Sort model groups - by name or by latency
-  const sortedModelGroups = useMemo(() => {
+  const sortedModelGroups = useMemo<[string, Model[]][]>(() => {
     const entries = Object.entries(filteredModelGroups)
     if (sortByLatency && Object.keys(healthResults).length > 0) {
       return entries
-        .map(([group, models]) => [
+        .map(([group, models]): [string, Model[]] => [
           group,
           [...models].sort((a, b) => {
             const lA = healthResults[a.id]?.latency ?? Infinity
