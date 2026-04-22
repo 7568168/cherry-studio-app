@@ -388,7 +388,7 @@ export default function ProviderSettingsScreen() {
                           backgroundColor: sortByLatency ? '#3b82f6' : pressed ? '#d1d5db' : '#f3f4f6'
                         })}
                       >
-                        <ArrowUpDown size={14} color={sortByLatency ? '#ffffff' : '#374151'} />
+                        <ChevronsUpDown size={14} color={sortByLatency ? '#ffffff' : '#374151'} />
                         <Text style={{ fontSize: 11, color: sortByLatency ? '#ffffff' : '#374151', fontWeight: '500' }}>
                           {sortByLatency ? t('settings.models.sort_by_name') : t('settings.models.sort_by_latency')}
                         </Text>
