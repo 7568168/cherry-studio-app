@@ -343,6 +343,7 @@ export default function ProviderSettingsScreen() {
                       onPress={handleHealthCheck}
                       disabled={isCheckingHealth}
                     />
+                    <IconButton icon={<RefreshCw size={18} />} onPress={onManageModel} />
                     <IconButton icon={<Plus size={18} />} onPress={onAddModel} />
                   </XStack>
                 </XStack>
