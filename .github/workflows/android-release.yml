@@ -1,5 +1,8 @@
 name: Android Release
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
     inputs:
@@ -167,7 +170,7 @@ jobs:
           draft: true
           prerelease: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
 
       # Step 13: Build Summary
       - name: Build Summary
