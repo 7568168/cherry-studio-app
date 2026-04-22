@@ -343,7 +343,23 @@ export default function ProviderSettingsScreen() {
                       onPress={handleHealthCheck}
                       disabled={isCheckingHealth}
                     />
-                    <IconButton icon={<RefreshCw size={18} />} onPress={onManageModel} />
+                    <Pressable
+                      onPress={onManageModel}
+                      style={({ pressed }) => ({
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 4,
+                        paddingHorizontal: 10,
+                        paddingVertical: 6,
+                        borderRadius: 6,
+                        backgroundColor: pressed ? '#d1d5db' : '#f3f4f6'
+                      })}
+                    >
+                      <RefreshCw size={14} color="#374151" />
+                      <Text style={{ fontSize: 12, color: '#374151', fontWeight: '500' }}>
+                        {t('settings.models.manage.fetch_list')}
+                      </Text>
+                    </Pressable>
                     <IconButton icon={<Plus size={18} />} onPress={onAddModel} />
                   </XStack>
                 </XStack>
