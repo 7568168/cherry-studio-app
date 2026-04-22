@@ -2,7 +2,7 @@ import type { RouteProp } from '@react-navigation/native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import { Spinner, Switch } from 'heroui-native'
 import { groupBy } from 'lodash'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Pressable, ScrollView } from 'react-native'
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller'
@@ -60,6 +60,7 @@ export default function ProviderSettingsScreen() {
 
   const [healthResults, setHealthResults] = useState<Record<string, ModelHealth>>({})
   const [isCheckingHealth, setIsCheckingHealth] = useState(false)
+  const [sortByLatency, setSortByLatency] = useState(false)
 
   const { providerId } = route.params
   const { provider, isLoading, updateProvider } = useProvider(providerId)
@@ -82,8 +83,27 @@ export default function ProviderSettingsScreen() {
   // Convert to entries and filter empty groups
   const filteredModelGroups = Object.fromEntries(Object.entries(modelGroups).filter(([, models]) => models.length > 0))
 
-  // 对分组进行排序
-  const sortedModelGroups = Object.entries(filteredModelGroups).sort(([a], [b]) => a.localeCompare(b))
+  // Sort model groups - by name or by latency
+  const sortedModelGroups = useMemo(() => {
+    const entries = Object.entries(filteredModelGroups)
+    if (sortByLatency && Object.keys(healthResults).length > 0) {
+      return entries
+        .map(([group, models]) => [
+          group,
+          [...models].sort((a, b) => {
+            const lA = healthResults[a.id]?.latency ?? Infinity
+            const lB = healthResults[b.id]?.latency ?? Infinity
+            return lA - lB
+          })
+        ])
+        .sort(([, a], [, b]) => {
+          const minA = Math.min(...a.map(m => healthResults[m.id]?.latency ?? Infinity))
+          const minB = Math.min(...b.map(m => healthResults[m.id]?.latency ?? Infinity))
+          return minA - minB
+        })
+    }
+    return entries.sort(([a], [b]) => a.localeCompare(b))
+  }, [filteredModelGroups, healthResults, sortByLatency])
 
   const onAddModel = () => {
     if (provider) {
@@ -336,13 +356,44 @@ export default function ProviderSettingsScreen() {
                 <XStack className="items-center justify-between pr-2.5">
                   <GroupTitle>{t('settings.models.title')}</GroupTitle>
                   <XStack className="items-center gap-2">
-                    <IconButton
-                      icon={
-                        isCheckingHealth ? <RefreshCw size={18} className="animate-spin" /> : <HeartPulse size={18} />
-                      }
+                    <Pressable
                       onPress={handleHealthCheck}
                       disabled={isCheckingHealth}
-                    />
+                      style={({ pressed }) => ({
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 4,
+                        paddingHorizontal: 8,
+                        paddingVertical: 6,
+                        borderRadius: 6,
+                        backgroundColor: isCheckingHealth ? '#e5e7eb' : pressed ? '#d1d5db' : '#f3f4f6',
+                        opacity: isCheckingHealth ? 0.6 : 1
+                      })}
+                    >
+                      {isCheckingHealth ? <RefreshCw size={14} color="#374151" /> : <HeartPulse size={14} color="#374151" />}
+                      <Text style={{ fontSize: 11, color: '#374151', fontWeight: '500' }}>
+                        {isCheckingHealth ? t('settings.models.health_check') + '...' : t('settings.models.health_check')}
+                      </Text>
+                    </Pressable>
+                    {Object.keys(healthResults).length > 0 && (
+                      <Pressable
+                        onPress={() => setSortByLatency(!sortByLatency)}
+                        style={({ pressed }) => ({
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 4,
+                          paddingHorizontal: 8,
+                          paddingVertical: 6,
+                          borderRadius: 6,
+                          backgroundColor: sortByLatency ? '#3b82f6' : pressed ? '#d1d5db' : '#f3f4f6'
+                        })}
+                      >
+                        <ArrowUpDown size={14} color={sortByLatency ? '#ffffff' : '#374151'} />
+                        <Text style={{ fontSize: 11, color: sortByLatency ? '#ffffff' : '#374151', fontWeight: '500' }}>
+                          {sortByLatency ? t('settings.models.sort_by_name') : t('settings.models.sort_by_latency')}
+                        </Text>
+                      </Pressable>
+                    )}
                     <Pressable
                       onPress={onManageModel}
                       style={({ pressed }) => ({
